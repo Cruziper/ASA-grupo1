@@ -30,12 +30,12 @@ void readData_Links(N_links){
 
 void testArguments(N_vertices, N_links){
   if(N_vertices < 2 || N_links < 1){
-    printf("Input incorreto\n", );
-    return 0;
+      fprintf(stderr, "Incorrect Input\n");
+      exit(-1);
   }
 }
 
-void stackPush (int v_index){
+void stackPush (struct vertice vert){
 
 }
 
@@ -49,6 +49,7 @@ int main() {
 
   readData();
 
+  struct vertice stack_array [N_vertices];
   struct vertice stack_array [N_vertices];
 
   testArguments();
