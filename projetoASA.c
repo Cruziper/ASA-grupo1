@@ -37,7 +37,6 @@ void testArguments(N_vertices, N_links){
 
 void stackPush (int v_index){
 
-
 }
 
 int stackPop(){
