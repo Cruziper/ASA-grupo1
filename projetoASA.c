@@ -38,15 +38,15 @@ struct vertice* criar_novo_vertice(int V){
 
 struct Grafo* criar_novo_grafo(int V) {
   struct Grafo* novoGrafo = novo_grafo;
-  grafo -> V = V;
+  novoGrafo -> Nvert = V;
 
-  grafo -> arrayAdjList = (struct listaAdja*) malloc(V * sizeof(struct listaAdja));
+  novoGrafo -> arrayAdjList = (struct listaAdja*) malloc(V * sizeof(struct listaAdja));
 
   int i;
   for (i=0; i < V; i++)
-    grafo->arrayAdjList[i].head = NULL;
+    novoGrafo->arrayAdjList[i].head = NULL;
 
-    return grafo;
+    return novoGrafo;
   }
 
 void adiciona_aresta(struct Grafo* grafo, int origem, int destino){
