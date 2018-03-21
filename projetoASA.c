@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
+#define novo_vertice (struct vertice*)malloc(sizeof(struct vertice))
+#define novo_grafo (struct Graph*) malloc(sizeof(struct Graph))
 
 typedef struct {
-  int v_index;
-  int d_u;
-  int low_u;
-  int in_stack;
+  int dest;
+  int v_origem;
+  int na_pilha;
+  int descoberta;
+  struct vertice *next;
 } vertice;
 
 typedef struct {
@@ -14,28 +18,45 @@ typedef struct {
   struct vertice *next;
 } aresta;
 
-void readData() {
-    scanf("%d\n", &N_vertices);
-    scanf("%d\n", &N_links);
+typedef struct {
+  struct vertice *head;
+} listaAdja;
+
+typedef struct {
+  int Nvert;
+  struct listaAdja* arrayAdjList;
+} Grafo;
+
+struct vertice* criar_novo_vertice(int V){
+  struct vertice* novoVer = novo_vertice;
+  novoVer -> dest = dest;
+  novoVer -> next = NULL;
+  novoVer -> descoberta = INFINITY;
+  novoVer -> v_origem = NULL
+  return novoVer;
 }
 
-void readData_Links(N_links){
-  for (int i = 1; i <= N_links; i++) {
-    scanf("%d %d\n", &vertice1, &vertice2);
-    addVertice(vertice1);
-    addVertice(vertice2);
-    addAresta(vertice1, vertice2);
+struct Grafo* criar_novo_grafo(int V) {
+  struct Grafo* novoGrafo = novo_grafo;
+  grafo -> V = V;
+
+  grafo -> arrayAdjList = (struct listaAdja*) malloc(V * sizeof(struct listaAdja));
+
+  int i;
+  for (i=0; i < V; i++)
+    grafo->arrayAdjList[i].head = NULL;
+
+    return grafo;
   }
+
+void adiciona_aresta(struct Grafo* grafo, int origem, int destino){
+  struct vertice* novoVer = criar_novo_vertice(destino);
+  novoVer->next = grafo->arrayAdjList[origem].head;
+  grafo->arrayAdjList[destino].head = novoVer;
 }
 
-void testArguments(N_vertices, N_links){
-  if(N_vertices < 2 || N_links < 1){
-      fprintf(stderr, "Incorrect Input\n");
-      exit(-1);
-  }
-}
+void stackPush (int v_index){
 
-void stackPush (struct vertice vert){
 
 }
 
@@ -43,19 +64,30 @@ int stackPop(){
 
 }
 
+
 int main() {
-  int N_vertices = 0;
-  int N_links = 0;
+  int NVertices = 0;
+  int NArestas = 0;
 
-  readData();
+  scanf("%d\n", &NVertices);
+  scanf("%d\n", &NArestas);
 
-  struct vertice stack_array [N_vertices];
-  struct vertice stack_array [N_vertices];
+  struct vertice *listaAdja[NVertices], *p;
 
-  testArguments();
+  for( i = 1 ; i <= NVertices ; i++ )
+		listaAdja[i] = NULL;
 
-  printf("%d\n", N_vertices );
-  printf("%d\n", N_links);
+  for (int i = 1; i <= NArestas; i++) {
+    scanf("%d %d\n", &vertice1, &vertice2);
+    addAresta(vertice1, vertice2);
+  }
+
+  if(NVertices<2 && NArestas<1){
+    return -1;
+  }
+
+  printf("%d\n", NVertices );
+  printf("%d\n", NArestas);
   //for (int i = 1; i <= ??; i++) {
   //  printf("%s\n", ??);
   //}
