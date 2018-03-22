@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #define newVertex_malloc (struct Vertex*)malloc(sizeof(Vertex))
 #define newGraph_malloc (struct Graph*) malloc(sizeof(Graph))
@@ -37,8 +36,8 @@ typedef struct Graph{
 struct Vertex* addVertex(int V){
   struct Vertex* newVertex = newVertex_malloc;
   newVertex -> vIndex = V;
-  newVertex -> d = 0;
-  newVertex -> low = -1;
+  newVertex -> d = -1; //NILL
+  newVertex -> low = -1; //INFINITY
   newVertex -> in_stack = 0;
   newVertex -> next = NULL;
   return newVertex;
@@ -113,6 +112,16 @@ void readData() {
        exit(-1);
    }
 }
+
+//> Tarjan Algorithm ///////////////////////////////////////////////////////////
+void scc_tarjan(struct Graph* graph){
+
+}
+
+void tarjan_visit(int v){
+
+}
+////////////////////////////////////////////////////////////////////////////////
 
 //> MAIN FUNCTION //////////////////////////////////////////////////////////////
 int main() {
