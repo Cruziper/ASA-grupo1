@@ -1,120 +1,140 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
-#define newVertex_malloc (struct Vertex*)malloc(sizeof(struct Vertex))
-#define newGraph_malloc (struct Graph*)malloc(sizeof(struct Graph))
-#define MAX_VERTEX 1000
+#define newVertex_malloc (struct Vertex*)malloc(sizeof(Vertex))
+#define newGraph_malloc (struct Graph*) malloc(sizeof(Graph))
+#define newAdjList_malloc (struct ListOFAdja*) malloc((N_Vertices+1) * sizeof(ListOFAdja))
 
-int vIndexGlobal = 0;
-
-typedef struct {
+//> Global VARIABLES ///////////////////////////////////////////////////////////
+int N_Vertices = 0;
+int N_Edges = 0;
+int vertexArray_POINTER = 0;
+//> STRUCTS ////////////////////////////////////////////////////////////////////
+typedef struct Vertex{
   int vIndex;
-  int discoveryTime;
-  int lowDiscoveryTime;
-  int in_stack;  //0 (it isn't) or 1 (it is)
+  int d;
+  int low;
+  int in_stack; //0 (it isn't) or 1 (it is)
   struct Vertex *next;
 } Vertex;
 
-typedef struct {
-  struct vertice *head;
-} ListaAdja;
+typedef struct ListOFAdja{
+  struct Vertex *head;
+} ListOFAdja;
 
-typedef struct {
+typedef struct Graph{
   int Nvert;
-  struct listaAdja* arrayAdjList;
+  struct ListOFAdja* arrayAdjList;
 } Graph;
+////////////////////////////////////////////////////////////////////////////////
 
-struct vertice* criar_novo_vertice(int V){
-  struct vertice* novoVer = novo_vertice;
-  novoVer->vIndex = V;
-  novoVer->discoveryTime = -1;
-  novoVer->in_stack = 0;
-  novoVer->next = NULL;
-  return novoVer;
+//> addVertex //////////////////////////////////////////////////////////////////
+struct Graph* addVertex(struct Graph* graph, int V){
+  struct Vertex* newVertex = newVertex_malloc;
+  newVertex -> vIndex = V;
+  newVertex -> d = -1; //NILL
+  newVertex -> low = -1; //INFINITY
+  newVertex -> in_stack = 0;
+  newVertex -> next = NULL;
+  graph->arrayAdjList[V].head = newVertex;
+  return graph;
 }
 
-struct Graph* criar_novo_grafo(int NumVertex) {
-  struct Grafo* novoGrafo = novo_grafo;
-  grafo->Nvert = NumVertex;
-  grafo->arrayAdjList = (struct listaAdja*)malloc(NumVertex * sizeof(struct listaAdja));
-  for (int i = 0; i < NumVertex; i++)
-    novoGrafo->arrayAdjList[i].head = NULL;
-    return novoGrafo;
-}
-
-void adiciona_aresta(int origem, int destino, struct Graph* grafo){
-  struct Vertex* novoVer = criar_novo_vertice(origem);
-  novoVer->next = grafo->arrayAdjList[destino].head;
-  grafo->arrayAdjList[origem].head = novoVer;
-}
-
-int stackPush (int v_index, int pilha[], int NumVertexs){
-  if pilha[NumVertex] < MAX_TAMANHO {
-    return pilha[NumVertex++];
-  }
-  else {
-    printf(stderr,"Erro pilha cheia.\n");
-  }
-}
-
-int stackPop(int pilha[], int NumVertexs){
-  if (pilha[NumVertexs] = 0) {
-    printf(stderr,"Erro pilha vazia\n");
-  }
-  else
-    return pilha[NumVertexs--];
-}
-
-
-void scc_tarjan(Graph graph){
-  int visited = 0;
-  int L = NULL;
-  for (int i = 0; i < graph->Nvert; i++) {
-    if(Vertex->discoveryTime = -1){
-      tarjan_visit(i);
+//> addEdge ////////////////////////////////////////////////////////////////////
+void addEdge(struct Graph* graph, int origin, int destiny){
+    if (&graph->arrayAdjList[origin] == NULL){
+        addVertex(graph, origin);
     }
+    if (&graph->arrayAdjList[destiny] == NULL){
+        addVertex(graph, destiny);
+    }
+  graph->arrayAdjList[origin].head->next = graph->arrayAdjList[destiny].head;
+}
+
+//> newGraph ///////////////////////////////////////////////////////////////////
+struct Graph* newGraph(int N_Vertices) {
+  struct Graph* newGraph = newGraph_malloc;
+  newGraph->Nvert = N_Vertices;
+  newGraph->arrayAdjList = newAdjList_malloc;
+
+  for (int i = 1; i <= N_Vertices; i++){
+      newGraph->arrayAdjList[i].head = NULL;
   }
+  return newGraph;
+}
+
+//> stackPush //////////////////////////////////////////////////////////////////
+int stackPush (int vertexArray, int v_index) {
+    if (vertexArray_POINTER < N_Vertices){
+        vertexArray[&vertexArray_POINTER] = v_index;
+        return vertexArray_POINTER++;
+    }
+    else{
+        fprintf(stderr, "Stack is Full: Can't store vertex\n");
+        exit(-1);
+    }
+}
+
+//> stackPop ///////////////////////////////////////////////////////////////////
+int stackPop(int vertexArray){
+    if (vertexArray_POINTER >= 0){
+        int vertexPOP = vertexArray[&vertexArray_POINTER-1]; //vertexArray_POINTER-1 porque a variavel global toma sempre o valor da proxima posicao vazia da lista
+        vertexArray_POINTER--;
+        return vertexPOP;
+    }
+    else{
+        fprintf(stderr, "Stack is Empty: Can't remove vertex\n");
+        exit(-1);
+    }
+}
+
+//> readData ///////////////////////////////////////////////////////////////////
+void readData() {
+     scanf("%d", &N_Vertices);
+     scanf("%d", &N_Edges);
+ }
+
+//> readEdges //////////////////////////////////////////////////////////////////
+ void readEdges(struct Graph* graph, int N_Edges){
+     int vertex_1, vertex_2;
+     for (int i = 1; i <= N_Edges; i++) {
+         scanf("%d %d", &vertex_1, &vertex_2);
+         addEdge(graph, vertex_1, vertex_2);
+     }
+ }
+
+//> testArguments //////////////////////////////////////////////////////////////
+ void testArguments(int N_Vertices, int N_Edges){
+   if(N_Vertices < 2 || N_Edges < 1){
+       fprintf(stderr, "Invalid Input\n");
+       exit(-1);
+   }
+}
+
+//> Tarjan Algorithm ///////////////////////////////////////////////////////////
+void scc_tarjan(struct Graph* graph){
+
 }
 
 void tarjan_visit(int v){
 
-
 }
+////////////////////////////////////////////////////////////////////////////////
 
-
+//> MAIN FUNCTION //////////////////////////////////////////////////////////////
 int main() {
-  int NVertices = 0;
-  int NArestas = 0;
-  int pilha[NVertices]
+  readData();
+  testArguments(N_Vertices, N_Edges);
+  struct Graph* graph = newGraph(N_Vertices);
+  readEdges(graph, N_Edges);
 
+  //int vertexArray [N_Vertices];
 
-  scanf("%d\n", &NVertices);
-  scanf("%d\n", &NArestas);
-
-  struct vertice *listaAdja[NVertices], *p;
-  struct Pilha* novaPilha = nova_pilha;
-
-  for( i = 1 ; i <= NVertices ; i++ )
-		listaAdja[i] = NULL;
-
-  for (int i = 1; i <= NArestas; i++) {
-    scanf("%d %d\n", &vertice1, &vertice2);
-    addAresta(vertice1, vertice2);
-  }
-
-  if(NVertices < 2 && NArestas < 1){
-    return -1;
-  }
-
-  for (int i = 0; i < NVertices; i++) {
-    if (v_index(i) == -1) {
-      tarjan(i);
-    }
-  }
-
-
-
+  printf("%d\n", graph->arrayAdjList[1].head->next->vIndex);
+  //for (int i = 1; i <= ??; i++) {
+  //  printf("%s\n", ??);
+  //}
 
   return 0;
 }
+////////////////////////////////////////////////////////////////////////////////
