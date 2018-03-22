@@ -29,26 +29,27 @@ typedef struct Graph{
 ////////////////////////////////////////////////////////////////////////////////
 
 //> addVertex //////////////////////////////////////////////////////////////////
-struct Graph* addVertex(struct Graph* graph, int V){
-  struct Vertex* newVertex = newVertex_malloc;
-  newVertex -> vIndex = V;
-  newVertex -> d = -1; //NILL
-  newVertex -> low = -1; //INFINITY
-  newVertex -> in_stack = 0;
-  newVertex -> next = NULL;
-  graph->arrayAdjList[V].head = newVertex;
-  return graph;
+struct Vertex* addVertex(struct Graph* graph, int V, struct Vertex* verticesArray){
+  //struct Vertex* newVertex = newVertex_malloc;
+  verticesArray[V].vIndex = V;
+  verticesArray[V].d = -1; //NILL
+  verticesArray[V].low = -1; //INFINITY
+  verticesArray[V].in_stack = 0;
+  verticesArray[V].next = NULL;
+  return verticesArray;
 }
 
 //> addEdge ////////////////////////////////////////////////////////////////////
-void addEdge(struct Graph* graph, int origin, int destiny){
+Vertex* addEdge(struct Graph* graph, int origin, int destiny, struct Vertex* verticesArray){
+    struct Vertex* verticesArray_aux = verticesArray;
     if (&graph->arrayAdjList[origin] == NULL){
-        addVertex(graph, origin);
+        verticesArray_aux = addVertex(graph, origin, verticesArray_aux);
     }
     if (&graph->arrayAdjList[destiny] == NULL){
-        addVertex(graph, destiny);
+        verticesArray_aux = addVertex(graph, destiny, verticesArray_aux);
     }
-  graph->arrayAdjList[origin].head->next = graph->arrayAdjList[destiny].head;
+  graph->arrayAdjList[origin].head->next = &verticesArray_aux[destiny];
+  return verticesArray_aux;
 }
 
 //> newGraph ///////////////////////////////////////////////////////////////////
@@ -95,11 +96,11 @@ void readData() {
  }
 
 //> readEdges //////////////////////////////////////////////////////////////////
- void readEdges(struct Graph* graph, int N_Edges){
+ void readEdges(struct Graph* graph, int N_Edges, struct Vertex* verticesArray){
      int vertex_1, vertex_2;
      for (int i = 1; i <= N_Edges; i++) {
          scanf("%d %d", &vertex_1, &vertex_2);
-         addEdge(graph, vertex_1, vertex_2);
+         addEdge(graph, vertex_1, vertex_2, verticesArray);
      }
  }
 
@@ -126,9 +127,8 @@ int main() {
   readData();
   testArguments(N_Vertices, N_Edges);
   struct Graph* graph = newGraph(N_Vertices);
-  readEdges(graph, N_Edges);
-
-  //int vertexArray [N_Vertices];
+  struct Vertex verticesArray [N_Vertices+1];
+  readEdges(graph, N_Edges, verticesArray);
 
   printf("%d\n", graph->arrayAdjList[1].head->next->vIndex);
   //for (int i = 1; i <= ??; i++) {
