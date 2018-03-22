@@ -3,6 +3,7 @@
 
 #define newVertex_malloc (struct Vertex*)malloc(sizeof(Vertex))
 #define newGraph_malloc (struct Graph*) malloc(sizeof(Graph))
+#define newAdjList_malloc (struct ListOFAdja*) malloc((N_Vertices+1) * sizeof(ListOFAdja))
 
 //> Global VARIABLES ///////////////////////////////////////////////////////////
 int N_Vertices = 0;
@@ -28,30 +29,35 @@ typedef struct Graph{
 ////////////////////////////////////////////////////////////////////////////////
 
 //> addVertex //////////////////////////////////////////////////////////////////
-struct Vertex* addVertex(int V){
+struct Graph* addVertex(struct Graph* graph, int V){
   struct Vertex* newVertex = newVertex_malloc;
   newVertex -> vIndex = V;
   newVertex -> d = -1; //NILL
   newVertex -> low = -1; //INFINITY
   newVertex -> in_stack = 0;
   newVertex -> next = NULL;
-  return newVertex;
+  graph->arrayAdjList[V].head = newVertex;
+  return graph;
 }
 
 //> addEdge ////////////////////////////////////////////////////////////////////
 void addEdge(struct Graph* graph, int origin, int destiny){
-  struct Vertex* newVertex = addVertex(destiny);
-  newVertex->next = graph->arrayAdjList[origin].head;
-  graph->arrayAdjList[destiny].head = newVertex;
+    if (&graph->arrayAdjList[origin] == NULL){
+        addVertex(graph, origin);
+    }
+    if (&graph->arrayAdjList[destiny] == NULL){
+        addVertex(graph, destiny);
+    }
+  graph->arrayAdjList[origin].head->next = graph->arrayAdjList[destiny].head;
 }
 
 //> newGraph ///////////////////////////////////////////////////////////////////
 struct Graph* newGraph(int N_Vertices) {
   struct Graph* newGraph = newGraph_malloc;
-  newGraph -> Nvert = N_Vertices;
-  newGraph -> arrayAdjList = (struct ListOFAdja*) malloc(N_Vertices * sizeof(ListOFAdja));
+  newGraph->Nvert = N_Vertices;
+  newGraph->arrayAdjList = newAdjList_malloc;
 
-  for (int i=0; i < N_Vertices; i++){
+  for (int i = 1; i <= N_Vertices; i++){
       newGraph->arrayAdjList[i].head = NULL;
   }
   return newGraph;
@@ -84,17 +90,15 @@ int stackPop(int vertexArray){
 
 //> readData ///////////////////////////////////////////////////////////////////
 void readData() {
-     scanf("%d\n", &N_Vertices);
-     scanf("%d\n", &N_Edges);
+     scanf("%d", &N_Vertices);
+     scanf("%d", &N_Edges);
  }
 
 //> readEdges //////////////////////////////////////////////////////////////////
  void readEdges(struct Graph* graph, int N_Edges){
      int vertex_1, vertex_2;
      for (int i = 1; i <= N_Edges; i++) {
-         scanf("%d %d\n", &vertex_1, &vertex_2);
-         addVertex(vertex_1);
-         addVertex(vertex_2);
+         scanf("%d %d", &vertex_1, &vertex_2);
          addEdge(graph, vertex_1, vertex_2);
      }
  }
@@ -126,8 +130,7 @@ int main() {
 
   //int vertexArray [N_Vertices];
 
-  printf("%d\n", N_Vertices );
-  printf("%d\n", N_Edges);
+  printf("%d\n", graph->arrayAdjList[1].head->next->vIndex);
   //for (int i = 1; i <= ??; i++) {
   //  printf("%s\n", ??);
   //}
