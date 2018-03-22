@@ -17,11 +17,6 @@ typedef struct Vertex{
   struct Vertex *next;
 } Vertex;
 
-typedef struct Edge{
-  int vertex;
-  struct Vertex *next;
-} Edge;
-
 typedef struct ListOFAdja{
   struct Vertex *head;
 } ListOFAdja;
@@ -85,7 +80,6 @@ int stackPop(int vertexArray){
         fprintf(stderr, "Stack is Empty: Can't remove vertex\n");
         exit(-1);
     }
-
 }
 
 //> readData ///////////////////////////////////////////////////////////////////
