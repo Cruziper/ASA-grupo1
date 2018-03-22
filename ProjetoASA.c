@@ -2,65 +2,83 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define novo_vertice (struct vertice*)malloc(sizeof(struct vertice))
-#define novo_grafo (struct Graph*) malloc(sizeof(struct Graph))
+#define newVertex_malloc (struct Vertex*)malloc(sizeof(struct Vertex))
+#define newGraph_malloc (struct Graph*)malloc(sizeof(struct Graph))
+#define MAX_VERTEX 1000
+
+int vIndexGlobal = 0;
 
 typedef struct {
-  int dest;
-  int v_origem;
-  int na_pilha;
-  int descoberta;
-  struct vertice *next;
-} vertice;
-
-typedef struct {
-  int vertice1;
-  struct vertice *next;
-} aresta;
+  int vIndex;
+  int discoveryTime;
+  int lowDiscoveryTime;
+  int in_stack;  //0 (it isn't) or 1 (it is)
+  struct Vertex *next;
+} Vertex;
 
 typedef struct {
   struct vertice *head;
-} listaAdja;
+} ListaAdja;
 
 typedef struct {
   int Nvert;
   struct listaAdja* arrayAdjList;
-} Grafo;
+} Graph;
 
 struct vertice* criar_novo_vertice(int V){
   struct vertice* novoVer = novo_vertice;
-  novoVer -> dest = dest;
-  novoVer -> next = NULL;
-  novoVer -> descoberta = INFINITY;
-  novoVer -> v_origem = NULL
+  novoVer->vIndex = V;
+  novoVer->discoveryTime = -1;
+  novoVer->in_stack = 0;
+  novoVer->next = NULL;
   return novoVer;
 }
 
-struct Grafo* criar_novo_grafo(int V) {
+struct Graph* criar_novo_grafo(int NumVertex) {
   struct Grafo* novoGrafo = novo_grafo;
-  grafo -> V = V;
+  grafo->Nvert = NumVertex;
+  grafo->arrayAdjList = (struct listaAdja*)malloc(NumVertex * sizeof(struct listaAdja));
+  for (int i = 0; i < NumVertex; i++)
+    novoGrafo->arrayAdjList[i].head = NULL;
+    return novoGrafo;
+}
 
-  grafo -> arrayAdjList = (struct listaAdja*) malloc(V * sizeof(struct listaAdja));
+void adiciona_aresta(int origem, int destino, struct Graph* grafo){
+  struct Vertex* novoVer = criar_novo_vertice(origem);
+  novoVer->next = grafo->arrayAdjList[destino].head;
+  grafo->arrayAdjList[origem].head = novoVer;
+}
 
-  int i;
-  for (i=0; i < V; i++)
-    grafo->arrayAdjList[i].head = NULL;
-
-    return grafo;
+int stackPush (int v_index, int pilha[], int NumVertexs){
+  if pilha[NumVertex] < MAX_TAMANHO {
+    return pilha[NumVertex++];
   }
-
-void adiciona_aresta(struct Grafo* grafo, int origem, int destino){
-  struct vertice* novoVer = criar_novo_vertice(destino);
-  novoVer->next = grafo->arrayAdjList[origem].head;
-  grafo->arrayAdjList[destino].head = novoVer;
+  else {
+    printf(stderr,"Erro pilha cheia.\n");
+  }
 }
 
-void stackPush (int v_index){
-
-
+int stackPop(int pilha[], int NumVertexs){
+  if (pilha[NumVertexs] = 0) {
+    printf(stderr,"Erro pilha vazia\n");
+  }
+  else
+    return pilha[NumVertexs--];
 }
 
-int stackPop(){
+
+void scc_tarjan(Graph graph){
+  int visited = 0;
+  int L = NULL;
+  for (int i = 0; i < graph->Nvert; i++) {
+    if(Vertex->discoveryTime = -1){
+      tarjan_visit(i);
+    }
+  }
+}
+
+void tarjan_visit(int v){
+
 
 }
 
@@ -68,11 +86,14 @@ int stackPop(){
 int main() {
   int NVertices = 0;
   int NArestas = 0;
+  int pilha[NVertices]
+
 
   scanf("%d\n", &NVertices);
   scanf("%d\n", &NArestas);
 
   struct vertice *listaAdja[NVertices], *p;
+  struct Pilha* novaPilha = nova_pilha;
 
   for( i = 1 ; i <= NVertices ; i++ )
 		listaAdja[i] = NULL;
@@ -82,15 +103,18 @@ int main() {
     addAresta(vertice1, vertice2);
   }
 
-  if(NVertices<2 && NArestas<1){
+  if(NVertices < 2 && NArestas < 1){
     return -1;
   }
 
-  printf("%d\n", NVertices );
-  printf("%d\n", NArestas);
-  //for (int i = 1; i <= ??; i++) {
-  //  printf("%s\n", ??);
-  //}
+  for (int i = 0; i < NVertices; i++) {
+    if (v_index(i) == -1) {
+      tarjan(i);
+    }
+  }
+
+
+
 
   return 0;
 }
