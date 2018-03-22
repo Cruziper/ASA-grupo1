@@ -2,11 +2,15 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define newVertexertex_malloc (struct Vertex*)malloc(sizeof(struct Vertex))
-#define newGraph_malloc (struct Graph*) malloc(sizeof(struct Graph))
+#define newVertex_malloc (struct Vertex*)malloc(sizeof(Vertex))
+#define newGraph_malloc (struct Graph*) malloc(sizeof(Graph))
 
+//> Global VARIABLES ///////////////////////////////////////////////////////////
+int N_Vertices = 0;
+int N_Edges = 0;
+int vertexArray_POINTER = 0;
 //> STRUCTS ////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct Vertex{
   int vIndex;
   int d;
   int low;
@@ -14,18 +18,18 @@ typedef struct {
   struct Vertex *next;
 } Vertex;
 
-typedef struct {
+typedef struct Edge{
   int vertex;
   struct Vertex *next;
 } Edge;
 
-typedef struct {
+typedef struct ListOFAdja{
   struct Vertex *head;
-} ListaAdja;
+} ListOFAdja;
 
-typedef struct {
+typedef struct Graph{
   int Nvert;
-  struct ListaAdja* arrayAdjList;
+  struct ListOFAdja* arrayAdjList;
 } Graph;
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -33,8 +37,8 @@ typedef struct {
 struct Vertex* addVertex(int V){
   struct Vertex* newVertex = newVertex_malloc;
   newVertex -> vIndex = V;
-  newVertex -> d = NULL;
-  newVertex -> low = INFINITY;
+  newVertex -> d = 0;
+  newVertex -> low = -1;
   newVertex -> in_stack = 0;
   newVertex -> next = NULL;
   return newVertex;
@@ -51,38 +55,58 @@ void addEdge(struct Graph* graph, int origin, int destiny){
 struct Graph* newGraph(int N_Vertices) {
   struct Graph* newGraph = newGraph_malloc;
   newGraph -> Nvert = N_Vertices;
-  newGraph -> arrayAdjList = (struct listaAdja*) malloc(V * sizeof(struct listaAdja));
+  newGraph -> arrayAdjList = (struct ListOFAdja*) malloc(N_Vertices * sizeof(ListOFAdja));
 
-  int i;
-  for (i=0; i < V; i++)
-    newGraph->arrayAdjList[i].head = NULL;
-
-    return newGraph;
+  for (int i=0; i < N_Vertices; i++){
+      newGraph->arrayAdjList[i].head = NULL;
   }
+  return newGraph;
+}
 
-void stackPush (int v_index){
+//> stackPush //////////////////////////////////////////////////////////////////
+int stackPush (int vertexArray, int v_index) {
+    if (vertexArray_POINTER < N_Vertices){
+        vertexArray[&vertexArray_POINTER] = v_index;
+        return vertexArray_POINTER++;
+    }
+    else{
+        fprintf(stderr, "Stack is Full: Can't store vertex\n");
+        exit(-1);
+    }
+}
 
+//> stackPop ///////////////////////////////////////////////////////////////////
+int stackPop(int vertexArray){
+    if (vertexArray_POINTER >= 0){
+        int vertexPOP = vertexArray[&vertexArray_POINTER-1]; //vertexArray_POINTER-1 porque a variavel global toma sempre o valor da proxima posicao vazia da lista
+        vertexArray_POINTER--;
+        return vertexPOP;
+    }
+    else{
+        fprintf(stderr, "Stack is Empty: Can't remove vertex\n");
+        exit(-1);
+    }
 
 }
 
-int stackPop(){
-
-}
-
+//> readData ///////////////////////////////////////////////////////////////////
 void readData() {
      scanf("%d\n", &N_Vertices);
      scanf("%d\n", &N_Edges);
  }
 
+//> readEdges //////////////////////////////////////////////////////////////////
  void readEdges(struct Graph* graph, int N_Edges){
-   for (int i = 1; i <= N_Edges; i++) {
-     scanf("%d %d\n", &vertex_1, &vertex_2);
-     addVertex(vertex_1);
-     addVertex(vertex_2);
-     addEdge(graph, vertex_1, vertex_2);
-   }
+     int vertex_1, vertex_2;
+     for (int i = 1; i <= N_Edges; i++) {
+         scanf("%d %d\n", &vertex_1, &vertex_2);
+         addVertex(vertex_1);
+         addVertex(vertex_2);
+         addEdge(graph, vertex_1, vertex_2);
+     }
  }
 
+//> testArguments //////////////////////////////////////////////////////////////
  void testArguments(int N_Vertices, int N_Edges){
    if(N_Vertices < 2 || N_Edges < 1){
        fprintf(stderr, "Invalid Input\n");
@@ -90,15 +114,14 @@ void readData() {
    }
 }
 
+//> MAIN FUNCTION //////////////////////////////////////////////////////////////
 int main() {
-  int N_Vertices = 0;
-  int N_Edges = 0;
   readData();
   testArguments(N_Vertices, N_Edges);
   struct Graph* graph = newGraph(N_Vertices);
   readEdges(graph, N_Edges);
 
-  int vertexArray [N_Vertices];
+  //int vertexArray [N_Vertices];
 
   printf("%d\n", N_Vertices );
   printf("%d\n", N_Edges);
@@ -108,3 +131,4 @@ int main() {
 
   return 0;
 }
+////////////////////////////////////////////////////////////////////////////////
