@@ -114,11 +114,15 @@ void readData() {
 
 //> Tarjan Algorithm ///////////////////////////////////////////////////////////
 void scc_tarjan(struct Graph* graph){
-
+  for (int i = 0; graph->arrayAdjList[i] != NULL; i++) {
+    if (graph->arrayAdjList[i].head->next->d == -1) {
+      tarjan_visit(graph->arrayAdjList[i].head->next->vIndex);
+    }
+  }
 }
 
 void tarjan_visit(int v){
-
+  
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -127,7 +131,7 @@ int main() {
   readData();
   testArguments(N_Vertices, N_Edges);
   struct Graph* graph = newGraph(N_Vertices);
-  struct Vertex verticesArray [N_Vertices+1];
+  struct Vertex verticesArray[N_Vertices+1];
   readEdges(graph, N_Edges, verticesArray);
 
   printf("%d\n", graph->arrayAdjList[1].head->next->vIndex);
