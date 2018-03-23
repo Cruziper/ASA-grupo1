@@ -25,7 +25,7 @@ typedef struct Vertex{
 } Vertex;
 
 typedef struct SubList{
-  Vertex sVertex;
+  struct Vertex* sVertex;
 }SubList;
 
 typedef struct ListOFAdja{
@@ -60,12 +60,7 @@ struct Graph* addEdge(struct Graph* graph, int origin, int destiny){
         graph = addVertex(graph, destiny);
     }
 
-    struct Vertex* headORIGIN = graph->arrayAdjList[origin].head;
-    for (int i = 0; i < N_Vertices+1 ; i++) {
-        headORIGIN->listVert[i++];
-        index = i;
-    }
-    headORIGIN->listVert[index].sVertex = graph->arrayAdjList[destiny].head;
+    graph->arrayAdjList[origin].head->listVert[destiny].sVertex = graph->arrayAdjList[destiny].head;
     return graph;
 }
 
@@ -143,19 +138,19 @@ void tarjan_visit(struct Graph* graph, int vertexVisit, int* vectorSCC){
     graph->arrayAdjList[vertexVisit].head->in_stack = 1;
 
     //percorre as arestas de vertexVisit ate encontrar a ultima da arrayAdjList
-    for (Vertex* currentVertex = graph->arrayAdjList[vertexVisit].head; currentVertex!=NULL; currentVertex = currentVertex->next){
+    for (int i = 1, struct Vertex* currentVertex = graph->arrayAdjList[vertexVisit].head; i <= N_Vertices; i++){
         //ao encontrar o ultimo vertice da lista de adjacencia
-        if (currentVertex->next == NULL && currentVertex != graph->arrayAdjList[vertexVisit].head && currentVertex->in_stack == 0){
+        if (currentVertex->listVert[i] == NULL && currentVertex != graph->arrayAdjList[vertexVisit].head && currentVertex->in_stack == 0){
             //repete o processo para um vertice novo
-            tarjan_visit(graph, currentVertex->vIndex, vectorSCC);
+            tarjan_visit(graph, currentVertex->listVert[i]->vIndex, vectorSCC);
         }
         //se o proximo vertice ja estiver Visitado
-        else if (currentVertex->next->in_stack == 1){
-            if (currentVertex->d == currentVertex->next->low){
+        else if (currentVertex->listVert[i+1]->in_stack == 1){
+            if (currentVertex->d == currentVertex->listVert[i+1]->low){
                 vectorSCC[currentVertex->vIndex] = currentVertex->vIndex;
             }
             //o vertice atual toma o valor menor de low
-            currentVertex->low = MIN(currentVertex->low, currentVertex->next->low);
+            currentVertex->low = MIN(currentVertex->low, currentVertex->listVert[i+1]->low);
             //retiramos o ultimo elemento da stack (coincide com o currentVertex->next)
             stackPop(stack);
             //o vertice atual passa a ser o que corresponde ao ultimo na stack
