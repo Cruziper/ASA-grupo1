@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #define newVertex_malloc (struct Vertex*)malloc(sizeof(Vertex))
@@ -41,7 +42,7 @@ struct Vertex* addVertex(struct Graph* graph, int V, struct Vertex* verticesArra
 }
 
 //> addEdge ////////////////////////////////////////////////////////////////////
-Vertex* addEdge(struct Graph* graph, int origin, int destiny, struct Vertex* verticesArray){
+struct Vertex* addEdge(struct Graph* graph, int origin, int destiny, struct Vertex* verticesArray){
     struct Vertex* verticesArray_aux = verticesArray;
     if (graph->arrayAdjList[origin].head == NULL){
         verticesArray_aux = addVertex(graph, origin, verticesArray_aux);
@@ -50,10 +51,11 @@ Vertex* addEdge(struct Graph* graph, int origin, int destiny, struct Vertex* ver
         verticesArray_aux = addVertex(graph, destiny, verticesArray_aux);
     }
     struct Vertex* headORIGIN = graph->arrayAdjList[origin].head;
+    struct Vertex* headORIGIN_new;
     while(headORIGIN->next != NULL){
-        headORIGIN = headORIGIN->next;
+        headORIGIN_new = headORIGIN->next;
     }
-    headORIGIN->next = &verticesArray_aux[destiny];
+    headORIGIN_new->next = &verticesArray_aux[destiny];
     return verticesArray_aux;
 }
 
@@ -101,12 +103,14 @@ void readData() {
  }
 
 //> readEdges //////////////////////////////////////////////////////////////////
- void readEdges(struct Graph* graph, int N_Edges, struct Vertex* verticesArray){
+ struct Vertex* readEdges(struct Graph* graph, int N_Edges, struct Vertex* verticesArray){
      int vertex_1, vertex_2;
+     struct Vertex* verticesArray_aux [N_Vertices];
      for (int i = 1; i <= N_Edges; i++) {
          scanf("%d %d", &vertex_1, &vertex_2);
-         addEdge(graph, vertex_1, vertex_2, verticesArray);
+         memcpy(verticesArray_aux, addEdge(graph, vertex_1, vertex_2, verticesArray), sizeof(verticesArray_aux));
      }
+     return verticesArray_aux;
  }
 
 //> testArguments //////////////////////////////////////////////////////////////
@@ -127,18 +131,27 @@ void tarjan_visit(int v){
 }
 ////////////////////////////////////////////////////////////////////////////////
 
+void printGraph(struct Graph*graph){
+    for(int i=1; i<=N_Vertices; i++){
+        printf("%d: ", i);
+        struct Vertex* vertexAUX = graph->arrayAdjList[i].head;
+        while(vertexAUX->next != NULL){
+            printf("%d --- ", vertexAUX->vIndex);
+            vertexAUX = vertexAUX->next;
+        }
+        printf("\n");
+    }
+    printf("Over\n");
+}
 //> MAIN FUNCTION //////////////////////////////////////////////////////////////
 int main() {
   readData();
   testArguments(N_Vertices, N_Edges);
   struct Graph* graph = newGraph(N_Vertices);
   struct Vertex verticesArray[N_Vertices+1];
-  readEdges(graph, N_Edges, verticesArray);
-
-  printf("%d\n", graph->arrayAdjList[1].head->next->vIndex);
-  //for (int i = 1; i <= ??; i++) {
-  //  printf("%s\n", ??);
-  //}
+  memcpy(verticesArray, readEdges(graph, N_Edges, verticesArray), sizeof(verticesArray));
+  //verticesArray = readEdges(graph, N_Edges, verticesArray);
+  printGraph(graph);
 
   return 0;
 }
