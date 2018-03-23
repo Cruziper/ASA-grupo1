@@ -36,16 +36,17 @@ struct Vertex* addVertex(struct Graph* graph, int V, struct Vertex* verticesArra
   verticesArray[V].low = -1; //INFINITY
   verticesArray[V].in_stack = 0;
   verticesArray[V].next = NULL;
+  graph->arrayAdjList[V].head = &verticesArray[V];
   return verticesArray;
 }
 
 //> addEdge ////////////////////////////////////////////////////////////////////
 Vertex* addEdge(struct Graph* graph, int origin, int destiny, struct Vertex* verticesArray){
     struct Vertex* verticesArray_aux = verticesArray;
-    if (&graph->arrayAdjList[origin] == NULL){
+    if (graph->arrayAdjList[origin].head == NULL){
         verticesArray_aux = addVertex(graph, origin, verticesArray_aux);
     }
-    if (&graph->arrayAdjList[destiny] == NULL){
+    if (graph->arrayAdjList[destiny].head == NULL){
         verticesArray_aux = addVertex(graph, destiny, verticesArray_aux);
     }
   graph->arrayAdjList[origin].head->next = &verticesArray_aux[destiny];
@@ -127,7 +128,7 @@ int main() {
   readData();
   testArguments(N_Vertices, N_Edges);
   struct Graph* graph = newGraph(N_Vertices);
-  struct Vertex verticesArray [N_Vertices+1];
+  struct Vertex verticesArray[N_Vertices+1];
   readEdges(graph, N_Edges, verticesArray);
 
   printf("%d\n", graph->arrayAdjList[1].head->next->vIndex);
