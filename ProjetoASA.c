@@ -5,21 +5,28 @@
 #define newVertex_malloc (struct Vertex*)malloc(sizeof(Vertex))
 #define newGraph_malloc (struct Graph*) malloc(sizeof(Graph))
 #define newAdjList_malloc (struct ListOFAdja*) malloc((N_Vertices+1) * sizeof(ListOFAdja))
+#define newSubList_malloc (struct SubList*) malloc((N_Vertices+1) * sizeof(SubList))
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 //> Global VARIABLES ///////////////////////////////////////////////////////////
 int N_Vertices = 0;
 int N_Edges = 0;
-int vertexArray_POINTER = 0;
+int stackPointer = 1;
 int visited = 0;
 int current_scc = 0;
+int stack;
 //> STRUCTS ////////////////////////////////////////////////////////////////////
 typedef struct Vertex{
   int vIndex;
   int d;
   int low;
   int in_stack; //0 (it isn't) or 1 (it is)
-  struct Vertex *next;
+  struct SubList* listVert;
 } Vertex;
+
+typedef struct SubList{
+  Vertex sVertex;
+}SubList;
 
 typedef struct ListOFAdja{
   struct Vertex *head;
@@ -32,33 +39,34 @@ typedef struct Graph{
 ////////////////////////////////////////////////////////////////////////////////
 
 //> addVertex //////////////////////////////////////////////////////////////////
-struct Vertex* addVertex(struct Graph* graph, int V, struct Vertex* verticesArray){
-  //struct Vertex* newVertex = newVertex_malloc;
-  verticesArray[V].vIndex = V;
-  verticesArray[V].d = -1; //NILL
-  verticesArray[V].low = -1; //INFINITY
-  verticesArray[V].in_stack = 0;
-  verticesArray[V].next = NULL;
-  graph->arrayAdjList[V].head = &verticesArray[V];
-  return verticesArray;
+struct Graph* addVertex(struct Graph* graph, int V){
+    graph->arrayAdjList[V].head = newVertex_malloc;
+    graph->arrayAdjList[V].head->vIndex = V;
+    graph->arrayAdjList[V].head->d = -1; //NILL
+    graph->arrayAdjList[V].head->low = -1; //INFINITY
+    graph->arrayAdjList[V].head->in_stack = 0;
+    graph->arrayAdjList[V].head->listVert = newSubList_malloc;
+    return graph;
 }
 
 //> addEdge ////////////////////////////////////////////////////////////////////
-struct Vertex* addEdge(struct Graph* graph, int origin, int destiny, struct Vertex* verticesArray){
-    struct Vertex* verticesArray_aux = verticesArray;
+struct Graph* addEdge(struct Graph* graph, int origin, int destiny){
+    int index = 0;
     if (graph->arrayAdjList[origin].head == NULL){
-        verticesArray_aux = addVertex(graph, origin, verticesArray_aux);
+        graph = addVertex(graph, origin);
+
     }
     if (graph->arrayAdjList[destiny].head == NULL){
-        verticesArray_aux = addVertex(graph, destiny, verticesArray_aux);
+        graph = addVertex(graph, destiny);
     }
+
     struct Vertex* headORIGIN = graph->arrayAdjList[origin].head;
-    struct Vertex* headORIGIN_new;
-    while(headORIGIN->next != NULL){
-        headORIGIN_new = headORIGIN->next;
+    for (int i = 0; i < N_Vertices+1 ; i++) {
+        headORIGIN->listVert[i++];
+        index = i;
     }
-    headORIGIN_new->next = &verticesArray_aux[destiny];
-    return verticesArray_aux;
+    headORIGIN->listVert[index].sVertex = graph->arrayAdjList[destiny].head;
+    return graph;
 }
 
 //> newGraph ///////////////////////////////////////////////////////////////////
@@ -74,10 +82,10 @@ struct Graph* newGraph(int N_Vertices) {
 }
 
 //> stackPush //////////////////////////////////////////////////////////////////
-int stackPush (int vertexArray, int v_index) {
-    if (vertexArray_POINTER < N_Vertices){
-        vertexArray[&vertexArray_POINTER] = v_index;
-        return vertexArray_POINTER++;
+void stackPush (int vertexArray, int v_index) {
+    if (stackPointer <= N_Vertices){
+        vertexArray[&stackPointer] = v_index;
+        stackPointer++;
     }
     else{
         fprintf(stderr, "Stack is Full: Can't store vertex\n");
@@ -87,9 +95,9 @@ int stackPush (int vertexArray, int v_index) {
 
 //> stackPop ///////////////////////////////////////////////////////////////////
 int stackPop(int vertexArray){
-    if (vertexArray_POINTER >= 0){
-        int vertexPOP = vertexArray[&vertexArray_POINTER-1]; //vertexArray_POINTER-1 porque a variavel global toma sempre o valor da proxima posicao vazia da lista
-        vertexArray_POINTER--;
+    if (stackPointer > 0){
+        int vertexPOP = vertexArray[&stackPointer-1]; //vertexArray_POINTER-1 porque a variavel global toma sempre o valor da proxima posicao vazia da lista
+        stackPointer--;
         return vertexPOP;
     }
     else{
@@ -105,14 +113,13 @@ void readData() {
  }
 
 //> readEdges //////////////////////////////////////////////////////////////////
- struct Vertex* readEdges(struct Graph* graph, int N_Edges, struct Vertex* verticesArray){
+ struct Graph* readEdges(struct Graph* graph, int N_Edges){
      int vertex_1, vertex_2;
-     struct Vertex* verticesArray_aux [N_Vertices];
      for (int i = 1; i <= N_Edges; i++) {
          scanf("%d %d", &vertex_1, &vertex_2);
-         memcpy(verticesArray_aux, addEdge(graph, vertex_1, vertex_2, verticesArray), sizeof(verticesArray_aux));
+         graph = addEdge(graph, vertex_1, vertex_2);
      }
-     return verticesArray_aux;
+     return graph;
  }
 
 //> testArguments //////////////////////////////////////////////////////////////
@@ -124,44 +131,48 @@ void readData() {
 }
 
 //> Tarjan Algorithm ///////////////////////////////////////////////////////////
-void scc_tarjan(struct Graph* graph, int *vetSCC){
-  for (int  j = 0; graph->arrayAdjList[j].head != NULL; j++) {
-    vetSCC[j] = -1;
-  }
 
-  for (int i = 0; graph->arrayAdjList[i] != NULL; i++) {
-    if (graph->arrayAdjList[i].head->next->d == -1) {
-      tarjan_visit(graph, graph->arrayAdjList[i].head->next->vIndex, vetSCC);
+void tarjan_visit(struct Graph* graph, int vertexVisit, int* vectorSCC){
+    visited++;
+    //low e d tomam o valor do vertice
+    graph->arrayAdjList[vertexVisit].head->low = visited;
+    graph->arrayAdjList[vertexVisit].head->d = visited;
+    //o index do vertice e colocado na stack
+    stackPush(stack, graph->arrayAdjList[vertexVisit].head->vIndex);
+    //flag de estado in_stack passa a 1
+    graph->arrayAdjList[vertexVisit].head->in_stack = 1;
+
+    //percorre as arestas de vertexVisit ate encontrar a ultima da arrayAdjList
+    for (Vertex* currentVertex = graph->arrayAdjList[vertexVisit].head; currentVertex!=NULL; currentVertex = currentVertex->next){
+        //ao encontrar o ultimo vertice da lista de adjacencia
+        if (currentVertex->next == NULL && currentVertex != graph->arrayAdjList[vertexVisit].head && currentVertex->in_stack == 0){
+            //repete o processo para um vertice novo
+            tarjan_visit(graph, currentVertex->vIndex, vectorSCC);
+        }
+        //se o proximo vertice ja estiver Visitado
+        else if (currentVertex->next->in_stack == 1){
+            if (currentVertex->d == currentVertex->next->low){
+                vectorSCC[currentVertex->vIndex] = currentVertex->vIndex;
+            }
+            //o vertice atual toma o valor menor de low
+            currentVertex->low = MIN(currentVertex->low, currentVertex->next->low);
+            //retiramos o ultimo elemento da stack (coincide com o currentVertex->next)
+            stackPop(stack);
+            //o vertice atual passa a ser o que corresponde ao ultimo na stack
+            currentVertex = graph->arrayAdjList[stack[&stackPointer]].head;
+        }
     }
-  }
 }
 
-void tarjan_visit(struct Graph* graph, int u, int *vetSCC){
-  visited++;
-  graph->arrayAdjList[u].head->low = visited;
-  graph->arrayAdjList[u].head->d = visited;
-  stackPush(graph->arrayAdjList[u], graph->arrayAdjList[u].head->vIndex);
-  graph->arrayAdjList[u].head->in_stack = 1;
-  for (int i = 0; graph->arrayAdjList[u].head != NULL; i++) {
-    if (graph->arrayAdjList[i].head->d == -1) {
-        tarjan_visit(graph, i);
-        graph->arrayAdjList[u].head->low = min(graph->arrayAdjList[u].head->low, graph->arrayAdjList[v].head->low);
-      }
-      else if (graph->arrayAdjList[u].head->in_stack == 1){
-          graph->arrayAdjList[u].head->low = min(graph->arrayAdjList[u].head->low, graph->arrayAdjList[v].head->low);
-      }
-      graph->arrayAdjList[u].head->low = min(graph->arrayAdjList[u].head->d, graph->arrayAdjList[v].head->d);
-    }
+void scc_tarjan(struct Graph* graph, int* vectorSCC){
+  for (int  j = 0; graph->arrayAdjList[j].head != NULL; j++) {
+    vectorSCC[j] = -1;
   }
-  if (graph->arrayAdjList[u].head->d == graph->arrayAdjList[u].head->low) {
-    int index;
-    while (graph->arrayAdjList[u].head->vIndex != graph->arrayAdjListv[v].head->vIndex) {
-      index = pilha.top();
-      stackPop(graph->arrayAdjList[v].head->vIndex);
-      graph->arrayAdjList[v].head->in_stack = 0;
-      vetSCC[v] = current_scc;
+
+  for (int i = 0; graph->arrayAdjList[i].head != NULL; i++) {
+    if (graph->arrayAdjList[i].head->next->d == -1) {
+      tarjan_visit(graph, graph->arrayAdjList[i].head->next->vIndex, vectorSCC);
     }
-    current_scc++;
   }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,25 +180,24 @@ void tarjan_visit(struct Graph* graph, int u, int *vetSCC){
 void printGraph(struct Graph*graph){
     for(int i=1; i<=N_Vertices; i++){
         printf("%d: ", i);
-        struct Vertex* vertexAUX = graph->arrayAdjList[i].head;
-        while(vertexAUX->next != NULL){
-            printf("%d --- ", vertexAUX->vIndex);
-            vertexAUX = vertexAUX->next;
+        struct Vertex* vertexAUX_next = graph->arrayAdjList[i].head->next;
+        while(vertexAUX_next != NULL){
+            printf("%d --- ", vertexAUX_next->vIndex);
+            vertexAUX_next = vertexAUX_next->next;
         }
         printf("\n");
     }
-    printf("Over\n");
 }
 //> MAIN FUNCTION //////////////////////////////////////////////////////////////
 int main() {
-  readData();
-  testArguments(N_Vertices, N_Edges);
-  struct Graph* graph = newGraph(N_Vertices);
-  struct Vertex verticesArray[N_Vertices+1];
-  memcpy(verticesArray, readEdges(graph, N_Edges, verticesArray), sizeof(verticesArray));
-  //verticesArray = readEdges(graph, N_Edges, verticesArray);
-  printGraph(graph);
+    readData();
+    testArguments(N_Vertices, N_Edges);
+    struct Graph* graph = newGraph(N_Vertices);
+    graph = readEdges(graph, N_Edges);
+    printGraph(graph);
+    int vectorSCC[N_Vertices];
+    scc_tarjan(graph, vectorSCC);
 
-  return 0;
+    return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
