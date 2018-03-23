@@ -5,6 +5,7 @@
 #define newVertex_malloc (struct Vertex*)malloc(sizeof(Vertex))
 #define newGraph_malloc (struct Graph*) malloc(sizeof(Graph))
 #define newAdjList_malloc (struct ListOFAdja*) malloc((N_Vertices+1) * sizeof(ListOFAdja))
+#define newSubList_malloc (struct SubList*) malloc((N_Vertices+1) * sizeof(SubList))
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 //> Global VARIABLES ///////////////////////////////////////////////////////////
@@ -20,8 +21,12 @@ typedef struct Vertex{
   int d;
   int low;
   int in_stack; //0 (it isn't) or 1 (it is)
-  struct Vertex *next;
+  struct SubList* listVert;
 } Vertex;
+
+typedef struct SubList{
+  Vertex sVertex;
+}SubList;
 
 typedef struct ListOFAdja{
   struct Vertex *head;
@@ -40,12 +45,13 @@ struct Graph* addVertex(struct Graph* graph, int V){
     graph->arrayAdjList[V].head->d = -1; //NILL
     graph->arrayAdjList[V].head->low = -1; //INFINITY
     graph->arrayAdjList[V].head->in_stack = 0;
-    graph->arrayAdjList[V].head->next = NULL;
+    graph->arrayAdjList[V].head->listVert = newSubList_malloc;
     return graph;
 }
 
 //> addEdge ////////////////////////////////////////////////////////////////////
 struct Graph* addEdge(struct Graph* graph, int origin, int destiny){
+    int index = 0;
     if (graph->arrayAdjList[origin].head == NULL){
         graph = addVertex(graph, origin);
 
@@ -55,11 +61,11 @@ struct Graph* addEdge(struct Graph* graph, int origin, int destiny){
     }
 
     struct Vertex* headORIGIN = graph->arrayAdjList[origin].head;
-    while(headORIGIN->next != NULL){
-        headORIGIN = headORIGIN->next;
+    for (int i = 0; i < N_Vertices+1 ; i++) {
+        headORIGIN->listVert[i++];
+        index = i;
     }
-
-    headORIGIN->next = graph->arrayAdjList[destiny].head;
+    headORIGIN->listVert[index].sVertex = graph->arrayAdjList[destiny].head;
     return graph;
 }
 
