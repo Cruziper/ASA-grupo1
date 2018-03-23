@@ -49,8 +49,12 @@ Vertex* addEdge(struct Graph* graph, int origin, int destiny, struct Vertex* ver
     if (graph->arrayAdjList[destiny].head == NULL){
         verticesArray_aux = addVertex(graph, destiny, verticesArray_aux);
     }
-  graph->arrayAdjList[origin].head->next = &verticesArray_aux[destiny];
-  return verticesArray_aux;
+    struct Vertex* headORIGIN = graph->arrayAdjList[origin].head;
+    while(headORIGIN->next != NULL){
+        headORIGIN = headORIGIN->next;
+    }
+    headORIGIN->next = &verticesArray_aux[destiny];
+    return verticesArray_aux;
 }
 
 //> newGraph ///////////////////////////////////////////////////////////////////
