@@ -38,6 +38,8 @@ typedef struct Graph{
 } Graph;
 /*////////////////////////////////////////////////////////////////////////////*/
 
+
+/*> min //////////////////////////////////////////////////////////////////////*/
 int min(int X, int Y){
   if (X < Y) {
     return X;
@@ -145,7 +147,7 @@ void readData() {
 
 /*> Tarjan Algorithm /////////////////////////////////////////////////////////*/
 
-void tarjan_visit(struct Graph* graph, int vertexVisit, int* vectorSCC){
+void tarjan_visit(struct Graph* graph, int vertexVisit, int* vectorSCC) {
     visited++;
     /*low e d tomam o valor do vertice*/
     graph->arrayAdjList[vertexVisit].head->low = visited;
@@ -162,39 +164,43 @@ void tarjan_visit(struct Graph* graph, int vertexVisit, int* vectorSCC){
         /*ao encontrar o ultimo vertice da lista de adjacencia*/
         if (currentVertex->listVert->next == NULL && currentVertex != graph->arrayAdjList[vertexVisit].head && currentVertex->in_stack == 0){
             /*repete o processo para um vertice novo*/
-             printf("aaaa");
+            printf("aaaa");
             tarjan_visit(graph, currentVertex->vIndex, vectorSCC);
         }
         /*se o proximo vertice ja estiver Visitado*/
         else if (currentVertex->listVert->next->sVertex->in_stack == 1){
-          /*if (currentVertex->d == currentVertex->listVert->next->sVertex->low){
-              vectorSCC[currentVertex->vIndex] = currentVertex->vIndex;*/
+            if (currentVertex->d == currentVertex->listVert->next->sVertex->low){
+              vectorSCC[currentVertex->vIndex] = currentVertex->vIndex;
               printf("aaaa");
+            }
         }
     }
-            /*o vertice atual toma o valor menor de low
-            currentVertex->low = min(currentVertex->low, currentVertex->listVert->next->sVertex->low);
-            retiramos o ultimo elemento da stack (coincide com o currentVertex->next)
+    if (graph->arrayAdjList[vertexVisit].head->low == graph->arrayAdjList[vertexVisit].head->d){
+        /*vectorSCC[currentVertex->vIndex] = currentVertex->vIndex;*/
+        current_scc++;
+        while (graph->arrayAdjList[vertexVisit].head->vIndex != graph->arrayAdjList[vertexVisit].head->listVert->sVertex->vIndex) {
             stackPop(stack);
-        o vertice atual passa a ser o que corresponde ao ultimo na stack
-            currentVertex = graph->arrayAdjList[stack[&stackPointer]].head;
+            graph->arrayAdjList[vertexVisit].head->listVert->sVertex->in_stack = 0;
+
+            /*o vertice atual passa a ser o que corresponde ao ultimo na stack*/
+            graph->arrayAdjList[vertexVisit].head = graph->arrayAdjList[stack[&stackPointer]].head;
         }
-    }*/
+    }
 }
 
 void scc_tarjan(int N_Vertices, struct Graph* graph, int* vectorSCC){
     int j, i;
-  for (j = 1; j <= N_Vertices; j++) {
-    vectorSCC[j] = -1;
-  }
+    for (j = 1; j <= N_Vertices; j++) {
+        vectorSCC[j] = -1;
+    }
 
-  for (i = 1; i <= N_Vertices; i++) {
-    if (graph->arrayAdjList[i].head->listVert->sVertex != NULL) {
-        if (graph->arrayAdjList[i].head->listVert->sVertex->d == -1) {
-            tarjan_visit(graph, i, vectorSCC);
+    for (i = 1; i <= N_Vertices; i++) {
+        if (graph->arrayAdjList[i].head->listVert->sVertex != NULL) {
+            if (graph->arrayAdjList[i].head->listVert->sVertex->d == -1) {
+                tarjan_visit(graph, i, vectorSCC);
+            }
         }
     }
-  }
  }
 /*////////////////////////////////////////////////////////////////////////////*/
 
